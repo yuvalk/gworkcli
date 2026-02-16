@@ -34,16 +34,21 @@ def authenticate():
     return creds
 
 
-def upload(md_path):
-    md_text = md_path.read_text()
-    html = markdown.markdown(md_text)
-    title = md_path.stem
+def extract_title(md_text, fallback):
+    """Return the first ATX heading from md_text, or fallback."""
     for line in md_text.splitlines():
         stripped = line.strip()
         if stripped:
             if stripped.startswith("#"):
-                title = stripped.lstrip("#").strip()
-            break
+                return stripped.lstrip("#").strip()
+            return fallback
+    return fallback
+
+
+def upload(md_path):
+    md_text = md_path.read_text()
+    html = markdown.markdown(md_text)
+    title = extract_title(md_text, md_path.stem)
 
     creds = authenticate()
     service = build("drive", "v3", credentials=creds)

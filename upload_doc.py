@@ -38,6 +38,12 @@ def upload(md_path):
     md_text = md_path.read_text()
     html = markdown.markdown(md_text)
     title = md_path.stem
+    for line in md_text.splitlines():
+        stripped = line.strip()
+        if stripped:
+            if stripped.startswith("#"):
+                title = stripped.lstrip("#").strip()
+            break
 
     creds = authenticate()
     service = build("drive", "v3", credentials=creds)
